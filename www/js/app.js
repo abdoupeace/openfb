@@ -3,7 +3,7 @@ angular.module('sociogram', ['ionic', 'ngCordova', 'openfb', 'sociogram.controll
     .run(function ($rootScope, $state, $ionicPlatform ,$window, OpenFB) {
 
         //on prod remove url  ,'http://localhost:8100/oauthcallback.html' 
-        OpenFB.init('915757828489400' );
+        OpenFB.init('915757828489400' , 'https://www.facebook.com/connect/login_success.html', window.localStorage);
  
         $ionicPlatform.ready(function () {
             if (window.StatusBar) {
