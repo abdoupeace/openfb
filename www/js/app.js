@@ -1,13 +1,15 @@
-angular.module('sociogram', ['ionic', 'openfb', 'sociogram.controllers'])
+angular.module('sociogram', ['ionic', 'ngCordova', 'openfb', 'sociogram.controllers'])
 
-    .run(function ($rootScope, $state, $ionicPlatform, $window, OpenFB) {
+    .run(function ($rootScope, $state, $ionicPlatform ,$window, OpenFB) {
 
-        OpenFB.init('915757828489400');
-
+        //on prod remove url  ,'http://localhost:8100/oauthcallback.html' 
+        OpenFB.init('915757828489400' );
+ 
         $ionicPlatform.ready(function () {
             if (window.StatusBar) {
                 StatusBar.styleDefault();
             }
+
         });
 
         $rootScope.$on('$stateChangeStart', function(event, toState) {
@@ -20,6 +22,10 @@ angular.module('sociogram', ['ionic', 'openfb', 'sociogram.controllers'])
         $rootScope.$on('OAuthException', function() {
             $state.go('app.login');
         });
+        
+
+            
+
 
     })
 
@@ -63,12 +69,12 @@ angular.module('sociogram', ['ionic', 'openfb', 'sociogram.controllers'])
                 }
             })
 
-            .state('app.share', {
-                url: "/share",
+            .state('app.not', {
+                url: "/not",
                 views: {
                     'menuContent': {
-                        templateUrl: "templates/share.html",
-                        controller: "ShareCtrl"
+                        templateUrl: "templates/not.html",
+                        controller: "NotCtrl"
                     }
                 }
             })
@@ -111,7 +117,7 @@ angular.module('sociogram', ['ionic', 'openfb', 'sociogram.controllers'])
             });
 
         // fallback route
-        $urlRouterProvider.otherwise('/app/person/me/feed');
+        $urlRouterProvider.otherwise('/app/not');
 
     });
 
