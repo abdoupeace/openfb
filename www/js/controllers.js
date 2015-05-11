@@ -23,7 +23,7 @@ angular.module('sociogram.controllers', [])
 
         $scope.facebookLogin = function () {
 
-            OpenFB.login('email,read_stream,publish_stream').then(
+            OpenFB.login('email,read_stream,publish_stream,user_friends,user_birthday').then(
                 function () {
                     $location.path('/app/person/me/feed');
                 },
@@ -34,19 +34,96 @@ angular.module('sociogram.controllers', [])
 
     })
 
-    .controller('ShareCtrl', function ($scope, OpenFB) {
+    .controller('NotCtrl', function ($scope, $cordovaLocalNotification) {
 
-        $scope.item = {};
-
-        $scope.share = function () {
-            OpenFB.post('/me/feed', $scope.item)
-                .success(function () {
-                    $scope.status = "This item has been shared on OpenFB";
-                })
-                .error(function(data) {
-                    alert(data.error.message);
-                });
+        $scope.add = function() {
+            var alarmTime = new Date();
+            alarmTime.setMinutes(alarmTime.getMinutes() + 1);
+            $cordovaLocalNotification.add({
+                id: "1234",
+                date: alarmTime,
+                message: "This is a message",
+                title: "This is a title",
+                autoCancel: true,
+                sound: null
+            }).then(function () {
+                console.log("The notification has been set");
+            });
         };
+ 
+        $scope.isScheduled = function() {
+            $cordovaLocalNotification.isScheduled("1234").then(function(isScheduled) {
+                alert("Notification 1234 Scheduled: " + isScheduled);
+            });
+        }
+        
+
+          $scope.addNotification = function () {
+            $cordovaLocalNotification.add({
+              id: 'some_notification_id'
+              // parameter documentation:
+              // https://github.com/katzer/cordova-plugin-local-notifications#further-informations-1
+            }).then(function () {
+              console.log('callback for adding background notification');
+            });
+          };
+
+          $scope.cancelNotification = function () {
+            $cordovaLocalNotification.cancel('some_notification_id').then(function () {
+              console.log('callback for cancellation background notification');
+            });
+          };
+
+          $scope.cancelAllNotification = function () {
+            $cordovaLocalNotification.cancelAll().then(function () {
+              console.log('callback for canceling all background notifications');
+            });
+          };
+
+          $scope.checkIfIsScheduled = function () {
+            $cordovaLocalNotification.isScheduled('some_notification_id').then(function (isScheduled) {
+              console.log(isScheduled);
+            });
+          };
+
+          $scope.getNotificationIds = function () {
+            $cordovaLocalNotification.getScheduledIds().then(function (scheduledIds) {
+              console.log(scheduledIds);
+            });
+          };
+
+          $scope.checkIfIsTriggered = function () {
+            $cordovaLocalNotification.isTriggered('some_notification_id').then(function (isTriggered) {
+              console.log(isTriggered);
+            });
+          };
+
+          $scope.getTriggeredIds = function () {
+            $cordovaLocalNotification.getTriggeredIds().then(function (triggeredIds) {
+              console.log(triggeredIds);
+            });
+          };
+
+          $scope.notificationDefaults = $cordovaLocalNotification.getDefaults();
+
+          $scope.setDefaultOptions = function () {
+            $cordovaLocalNotification.setDefaults({ autoCancel: true });
+          };
+
+
+          $rootScope.$on("$cordovaLocalNotification:canceled", function(e,notification) {
+          });
+
+          $rootScope.$on("$cordovaLocalNotification:clicked", function(e,notification) {
+          });
+
+          $rootScope.$on("$cordovaLocalNotification:triggered", function(e,notification) {
+          });
+
+          $rootScope.$on("$cordovaLocalNotification:added", function(e,notification) {
+          });
+
+
 
     })
 
@@ -63,12 +140,12 @@ angular.module('sociogram.controllers', [])
     })
 
     .controller('FriendsCtrl', function ($scope, $stateParams, OpenFB) {
-        OpenFB.get('/' + $stateParams.personId + '/friends', {limit: 50})
+        OpenFB.get('/me/friends', {limit: 50})
             .success(function (result) {
                 $scope.friends = result.data;
             })
             .error(function(data) {
-                alert(data.error.message);
+                alert("friendsctrl" + data.error.message);
             });
     })
 
@@ -95,7 +172,7 @@ angular.module('sociogram.controllers', [])
 
         function loadFeed() {
             $scope.show();
-            OpenFB.get('/' + $stateParams.personId + '/home', {limit: 30})
+            OpenFB.get('/' + $stateParams.personId + '/home', {limit: 10})
                 .success(function (result) {
                     $scope.hide();
                     $scope.items = result.data;
@@ -104,7 +181,7 @@ angular.module('sociogram.controllers', [])
                 })
                 .error(function(data) {
                     $scope.hide();
-                    alert(data.error.message);
+                    alert("FeedCtrl " + data.error.message);
                 });
         }
 
